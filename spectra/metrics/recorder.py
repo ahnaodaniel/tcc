@@ -1,12 +1,15 @@
 """Derived-feature recorder.
 
-**No video or image of the patient is ever stored.** Each frame is reduced to a handful
-of numbers (joint angles, opposition distances, fingertip position) and those are kept at
-a reduced rate, 10 Hz by default, which is well above the bandwidth of a voluntary hand
-movement but roughly a third of the data a 30 fps stream would produce.
+**No video or image of the patient is ever stored.** Each frame is reduced to a handful of
+numbers (joint angles, opposition distances, palm orientation) and those are kept at a
+reduced rate, 10 Hz by default.
 
-Tracking quality is counted over *every* frame, not only stored ones, so the report can
-tell a therapist that a session was too poorly tracked to be trusted.
+The fingertip **trajectory is kept at the full frame rate** in a separate, much lighter
+buffer (three floats per frame). Tremor lives in the 4-12 Hz band, and by Nyquist a 10 Hz
+recording could not see it at all; 30 fps gives a 15 Hz ceiling, which covers the band.
+
+Tracking quality is counted over *every* frame, not only stored ones, so the report can tell
+a therapist that a session was too poorly tracked to be trusted.
 """
 
 from __future__ import annotations
@@ -18,15 +21,28 @@ from spectra.detection.landmarks import INDEX_TIP, HandLandmarks
 from spectra.gestures.features import (
     finger_flexion_angles,
     opposition_ratios,
+    palm_openness,
+    palm_rotation,
     palm_size,
     thumb_abduction_ratio,
+)
+from spectra.metrics.tracking_quality import (
+    MIN_RELIABLE_CONFIDENCE,
+    MIN_RELIABLE_PRESENCE,
+    TrackingQuality,
 )
 
 DEFAULT_RATE_HZ = 10.0
 
-#: Below this, the report labels the whole session unreliable.
-MIN_RELIABLE_PRESENCE = 0.60
-MIN_RELIABLE_CONFIDENCE = 0.50
+__all__ = [
+    "DEFAULT_RATE_HZ",
+    "MIN_RELIABLE_CONFIDENCE",
+    "MIN_RELIABLE_PRESENCE",
+    "FrameSample",
+    "SessionRecorder",
+    "TrackingQuality",
+    "TrajectoryPoint",
+]
 
 
 @dataclass(frozen=True)
@@ -39,7 +55,10 @@ class FrameSample:
     thumb_abduction: float
     index_tip: tuple[float, float]
     palm_size: float
-    confidence: float
+    #: Wrist proxies. Both are **estimates**; see ``docs/metrics.md``.
+    palm_rotation: float = 0.0
+    palm_openness: float = 0.0
+    confidence: float = 0.0
 
     def to_dict(self) -> dict:
         return {
@@ -49,46 +68,28 @@ class FrameSample:
             "thumb_abduction": self.thumb_abduction,
             "index_tip": list(self.index_tip),
             "palm_size": self.palm_size,
+            "palm_rotation": self.palm_rotation,
+            "palm_openness": self.palm_openness,
             "confidence": self.confidence,
         }
 
 
 @dataclass(frozen=True)
-class TrackingQuality:
-    """How well the camera saw the hand; gates the credibility of every other metric."""
+class TrajectoryPoint:
+    """One full-rate fingertip position, for the tremor analysis."""
 
-    frames_total: int
-    frames_with_hand: int
-    mean_confidence: float
-
-    @property
-    def presence_ratio(self) -> float:
-        return self.frames_with_hand / self.frames_total if self.frames_total else 0.0
-
-    @property
-    def reliable(self) -> bool:
-        return (
-            self.frames_total > 0
-            and self.presence_ratio >= MIN_RELIABLE_PRESENCE
-            and self.mean_confidence >= MIN_RELIABLE_CONFIDENCE
-        )
-
-    def to_dict(self) -> dict:
-        return {
-            "frames_total": self.frames_total,
-            "frames_with_hand": self.frames_with_hand,
-            "mean_confidence": self.mean_confidence,
-            "presence_ratio": self.presence_ratio,
-            "reliable": self.reliable,
-        }
+    at: float
+    x: float
+    y: float
 
 
 @dataclass
 class SessionRecorder:
-    """Collects :class:`FrameSample` at a fixed rate plus tracking statistics."""
+    """Collects :class:`FrameSample` at a fixed rate plus a full-rate trajectory."""
 
     rate_hz: float = DEFAULT_RATE_HZ
     samples: list[FrameSample] = field(default_factory=list)
+    trajectory: list[TrajectoryPoint] = field(default_factory=list)
     frames_total: int = 0
     frames_with_hand: int = 0
     _confidence_sum: float = 0.0
@@ -111,10 +112,13 @@ class SessionRecorder:
             return None
         self.frames_with_hand += 1
         self._confidence_sum += confidence
+
+        tip = landmarks[INDEX_TIP]
+        self.trajectory.append(TrajectoryPoint(current, tip.x, tip.y))
+
         if self._last_stored_at is not None and current - self._last_stored_at < self.interval:
             return None
         self._last_stored_at = current
-        tip = landmarks[INDEX_TIP]
         sample = FrameSample(
             at=current,
             flexion=finger_flexion_angles(landmarks),  # type: ignore[arg-type]
@@ -122,6 +126,8 @@ class SessionRecorder:
             thumb_abduction=thumb_abduction_ratio(landmarks),
             index_tip=(tip.x, tip.y),
             palm_size=palm_size(landmarks),
+            palm_rotation=palm_rotation(landmarks),
+            palm_openness=palm_openness(landmarks),
             confidence=confidence,
         )
         self.samples.append(sample)
@@ -139,6 +145,7 @@ class SessionRecorder:
 
     def reset(self) -> None:
         self.samples.clear()
+        self.trajectory.clear()
         self.frames_total = 0
         self.frames_with_hand = 0
         self._confidence_sum = 0.0
@@ -147,3 +154,6 @@ class SessionRecorder:
     def window(self, start: float, end: float) -> list[FrameSample]:
         """Samples recorded within ``[start, end]``, for per-exercise summaries."""
         return [sample for sample in self.samples if start <= sample.at <= end]
+
+    def trajectory_window(self, start: float, end: float) -> list[TrajectoryPoint]:
+        return [point for point in self.trajectory if start <= point.at <= end]

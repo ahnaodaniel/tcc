@@ -47,6 +47,8 @@ class TestSampling:
             "thumb_abduction",
             "index_tip",
             "palm_size",
+            "palm_rotation",
+            "palm_openness",
             "confidence",
         }
 

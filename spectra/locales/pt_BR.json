@@ -66,6 +66,15 @@
       "fallback": "Dedos sem calibração confiável: {fingers}"
     }
   },
+  "metrics": {
+    "quality": {
+      "no_frames": "Nenhum quadro foi registrado nesta sessão.",
+      "low_presence": "A mão foi detectada em menos de 60% dos quadros; as medidas desta sessão são pouco confiáveis.",
+      "low_confidence": "A confiança média da detecção ficou abaixo de 0,50; as medidas desta sessão são pouco confiáveis."
+    },
+    "estimate_note": "Valor estimado a partir de imagem 2D; não substitui goniometria.",
+    "not_measurable": "Não mensurável nesta sessão"
+  },
   "safety": {
     "rest": "Hora de descansar: relaxe a mão por alguns instantes.",
     "time_limit": "Limite de tempo da sessão atingido.",

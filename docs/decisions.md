@@ -173,3 +173,42 @@ presence ratio stays honest.
 **D-035 — Each exercise run records a time window (`started_at`, `ended_at`).**
 The metrics engine slices the shared session recording by window, so modes never need to know
 anything about ROM, tremor or fatigue.
+
+## Phase 4 — Metrics engine
+
+**D-036 — The fingertip trajectory is recorded at the full frame rate, separately from the
+10 Hz feature samples.**
+Tremor lives at 4-12 Hz; by Nyquist a 10 Hz recording cannot resolve it at all. The trajectory
+costs three floats per frame, so keeping it at 30 Hz is nearly free while the heavy feature
+samples stay throttled. `test_a_ten_hertz_recording_cannot_resolve_the_band` pins the reasoning
+into the test suite.
+
+**D-037 — `band_measurable` is returned instead of a plausible wrong number.**
+When the window is too short or the rate too low, the tremor ratio is reported as not
+measurable rather than computed from aliased data. A clinical tool that silently returns
+nonsense is worse than one that says it does not know.
+
+**D-038 — Wrist measures are two explicit palm proxies, never a "wrist angle".**
+MediaPipe has no forearm landmarks, so there is no anatomical reference for a wrist angle.
+`palm_rotation` and `palm_openness` are named after what they actually measure, and
+`WristEstimate.estimate` is `True` at the type level so no report can forget the label.
+
+**D-039 — Fatigue compares thirds, using a symmetric bounded decline.**
+First-versus-last repetition is too noisy; thirds average that out. `(start - end) /
+max(start, end)` stays in `[-1, 1]` and remains defined when the patient started from no
+measurable movement, which plain `(start - end) / start` does not.
+
+**D-040 — The thumb is excluded from the fatigue amplitude.**
+It is the noisiest of the five signals (D-016), so including it would mostly add variance.
+
+**D-041 — Metrics are computed even for unreliable sessions; the report does the flagging.**
+Returning `None` would force every consumer to special-case it. Instead `TrackingQuality`
+travels with the numbers and carries a `warning_key` explaining exactly which threshold failed.
+
+**D-042 — `TrackingQuality` lives in its own module, imported by the recorder.**
+It is the gate on every other metric and is consumed by reports and the panel; burying it in
+`recorder.py` would have made that dependency invisible.
+
+**D-043 — NumPy is used for the tremor spectrum only.**
+Everything else in `metrics/` is plain Python, so the modules stay importable and fast. NumPy is
+already a transitive dependency of OpenCV, so this adds nothing to the install.

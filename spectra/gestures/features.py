@@ -21,6 +21,7 @@ from spectra.detection.landmarks import (
     MIDDLE_MCP,
     MIDDLE_PIP,
     MIDDLE_TIP,
+    PALM_TRIANGLE,
     PINKY_PIP,
     PINKY_TIP,
     RING_PIP,
@@ -114,6 +115,30 @@ def opposition_ratios(landmarks: HandLandmarks) -> tuple[float, ...]:
     tips = (INDEX_TIP, MIDDLE_TIP, RING_TIP, PINKY_TIP)
     scale = palm_size(landmarks)
     return tuple(distance(landmarks[THUMB_TIP], landmarks[tip]) / scale for tip in tips)
+
+
+# ------------------------------------------------------- wrist (ESTIMATE ONLY)
+def palm_rotation(landmarks: HandLandmarks) -> float:
+    """In-plane palm angle in degrees, 0 = fingers pointing straight up.
+
+    **Estimate.** MediaPipe Hands provides no forearm landmarks, so this is the
+    orientation of the palm itself, not a true wrist angle. It approximates radial/ulnar
+    deviation only while the forearm is held still. See ``docs/metrics.md``.
+    """
+    wrist = landmarks[WRIST]
+    middle = landmarks[MIDDLE_MCP]
+    return math.degrees(math.atan2(middle.x - wrist.x, wrist.y - middle.y))
+
+
+def palm_openness(landmarks: HandLandmarks) -> float:
+    """Area of the palm triangle (wrist, index MCP, pinky MCP) over the palm size squared.
+
+    **Estimate.** Foreshortening proxy: the triangle flattens as the palm turns away from
+    the camera, so this tracks pronation/supination only in a relative sense.
+    """
+    a, b, c = (landmarks[i] for i in PALM_TRIANGLE)
+    area = abs((b.x - a.x) * (c.y - a.y) - (c.x - a.x) * (b.y - a.y)) / 2.0
+    return area / (palm_size(landmarks) ** 2)
 
 
 # ----------------------------------------------------------------------- pointer
