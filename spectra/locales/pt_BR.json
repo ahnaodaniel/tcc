@@ -75,6 +75,84 @@
     "estimate_note": "Valor estimado a partir de imagem 2D; não substitui goniometria.",
     "not_measurable": "Não mensurável nesta sessão"
   },
+  "patient": {
+    "sex": {
+      "female": "Feminino",
+      "male": "Masculino",
+      "other": "Outro",
+      "undisclosed": "Não informado"
+    }
+  },
+  "report": {
+    "title": "SPECTRA — Relatório de Sessão",
+    "no_notes": "Sem anotações do fisioterapeuta.",
+    "demo_mode_notice": "Modo demonstração ativo: a identificação do paciente está mascarada.",
+    "disclaimer": "SPECTRA é um protótipo de pesquisa (Trabalho de Conclusão de Curso) e não é um dispositivo médico certificado. As medidas angulares derivam de uma webcam 2D, são aproximações e não substituem goniometria. Este relatório é um apoio à avaliação clínica e não deve ser usado como base única para decisão terapêutica.",
+    "section": {
+      "identification": "Identificação",
+      "session": "Sessão",
+      "exercises": "Exercícios realizados",
+      "metrics": "Métricas",
+      "comparison": "Comparação com a sessão anterior",
+      "trend": "Evolução entre sessões",
+      "charts": "Gráficos",
+      "notes": "Anotações do fisioterapeuta",
+      "warning": "Atenção: qualidade de rastreamento"
+    },
+    "field": {
+      "patient": "Paciente",
+      "cpf": "CPF",
+      "age": "Idade",
+      "sex": "Sexo",
+      "dominant_hand": "Mão dominante",
+      "affected_hand": "Mão tratada",
+      "diagnosis": "Diagnóstico (CID)",
+      "date": "Data",
+      "duration": "Duração",
+      "hand": "Mão",
+      "gesture_profile": "Perfil de gestos",
+      "session_number": "Sessão nº",
+      "pain_before": "Dor antes (EVA)",
+      "pain_after": "Dor depois (EVA)",
+      "exercise": "Exercício",
+      "reps": "Repetições",
+      "pace": "Ritmo (rep/min)",
+      "metric": "Métrica",
+      "value": "Valor",
+      "note": "Observação",
+      "current": "Atual",
+      "previous": "Anterior",
+      "delta": "Variação"
+    },
+    "metric": {
+      "rom_finger": "Amplitude de movimento — {finger}",
+      "wrist_rotation": "Rotação do punho (estimativa)",
+      "tremor_band": "Energia espectral 4–12 Hz",
+      "jerk": "Suavidade (jerk médio)",
+      "amplitude_decline": "Queda de amplitude",
+      "pace_decline": "Queda de ritmo",
+      "score": "Melhor pontuação (desenho guiado)",
+      "mean_deviation": "Desvio médio do traçado",
+      "completion": "Percurso concluído"
+    },
+    "compare": {
+      "mean_rom": "Amplitude média",
+      "score": "Pontuação",
+      "amplitude_decline": "Queda de amplitude (%)"
+    },
+    "trend": {
+      "up": "↑ aumento",
+      "down": "↓ redução",
+      "stable": "= estável",
+      "new": "primeira sessão"
+    },
+    "chart": {
+      "rom_title": "Amplitude de movimento por dedo",
+      "exercises_title": "Repetições por exercício",
+      "degrees": "graus",
+      "target": "Meta"
+    }
+  },
   "safety": {
     "rest": "Hora de descansar: relaxe a mão por alguns instantes.",
     "time_limit": "Limite de tempo da sessão atingido.",

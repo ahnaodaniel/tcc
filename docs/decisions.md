@@ -268,3 +268,49 @@ validation or from the database.
 **D-055 — Exports are named `patient_<uuid>.json`.**
 Filenames leak: they appear in sync clients, backup indexes and shoulder-surfing. The UUID is
 the only identifier that ever reaches a filename.
+
+## Phase 7 — Reports (built before the panel)
+
+**D-056 — Reports implemented before the therapist panel, inverting the stated order.**
+The panel's "generate and download PDF/TXT" button is one of its features; building it first
+would have required a stub that then had to be rewritten. The phase numbering in the commit
+history reflects the dependency, not the brief's ordering.
+
+**D-057 — One `SessionReport` object, two renderers.**
+PDF and TXT read the same frozen dataclass, so they can never disagree about a value. The
+object is pure data, which means the *content* of a report is unit tested without generating a
+single file.
+
+**D-058 — Masking happens in the builder, never in the renderers.**
+Demo mode and CPF masking are applied when the object is constructed. A renderer cannot leak a
+name it was never given, so adding a third output format later cannot reintroduce the leak.
+
+**D-059 — ReportLab for the PDF.**
+Pure Python, no system dependency (unlike WeasyPrint's GTK stack on Windows), and its Platypus
+flowables handle the table-heavy layout a clinical report needs. Rejected: fpdf2 (weaker
+tables), HTML-to-PDF (extra runtime to install on the patient's machine).
+
+**D-060 — Matplotlib on the `Agg` backend, returning PNG bytes.**
+`Agg` needs no display server, so charts render headless and in CI. Returning bytes rather than
+writing files means no patient-derived image is ever left in a temporary directory.
+
+**D-061 — Chart labels are ASCII-folded; PDF body text is not.**
+Matplotlib's default font stack is unpredictable across machines, so folding labels avoids
+tofu boxes in the thesis. ReportLab's Helvetica renders pt-BR accents correctly, so the body
+keeps proper spelling.
+
+**D-062 — `estimate` is a field on `MetricRow`, not a naming convention.**
+Every renderer reads the same flag, so a metric cannot be shown without its "estimativa" label
+by forgetting to type it. The wrist rows and all 2D-derived angles set it.
+
+**D-063 — Report filenames are `sessao_<session-uuid>`, and the PDF subject is the UUID.**
+Filenames and document metadata both leak into sync clients and file browsers; neither ever
+carries a name or a CPF.
+
+**D-064 — An unmeasurable metric renders as an em dash, not as zero.**
+`band_measurable=False` becomes "—" so a therapist is never shown a 0% tremor that actually
+means "could not be measured".
+
+**D-065 — Only three values are compared between sessions.**
+Mean ROM, best guided-drawing score and amplitude decline. Comparing every metric would produce
+a wall of numbers where the regression that matters is invisible.
