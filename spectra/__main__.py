@@ -22,6 +22,12 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="handedness of the hand being treated (default: first hand detected)",
     )
+    parser.add_argument(
+        "--session",
+        default=None,
+        metavar="UUID",
+        help="attach to a session created in the therapist panel and store its metrics",
+    )
     parser.add_argument("--no-sound", action="store_true", help="disable audio feedback")
     parser.add_argument("--verbose", action="store_true", help="enable debug logging")
     return parser
@@ -43,7 +49,7 @@ def main(argv: list[str] | None = None) -> int:
     from spectra.app import SpectraApp  # imported late: pulls in MediaPipe
 
     try:
-        SpectraApp(config, hand_label=args.hand).run()
+        SpectraApp(config, hand_label=args.hand, session_id=args.session).run()
     except RuntimeError as exc:
         logging.getLogger("spectra").error("%s", exc)
         return 1

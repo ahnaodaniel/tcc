@@ -362,3 +362,42 @@ call, so one click masks the screen and the next generated PDF alike.
 **D-075 — Two `.bat` launchers under `scripts/`, which activate the venv and pause on error.**
 A double-clicked `.bat` that fails closes instantly and shows nothing; pausing on error is the
 difference between a usable launcher and an unexplained flash.
+
+## Phase 8 — Documentation and polish
+
+**D-076 — The patient app can attach to a panel-created session (`--session <uuid>`).**
+Without it the panel's instruction would have been a lie: it tells the therapist to run that
+exact command. Attaching loads the session's hand and gesture profile and the patient's
+calibration, requires the PIN, and on exit computes and persists every metric.
+
+**D-077 — Nothing is recorded before the PIN is accepted.**
+The recorder only runs once `PinEntryMode` hands control over, so a stranger standing in front
+of the camera cannot contribute frames to a patient's session.
+
+**D-078 — Standalone mode persists nothing.**
+`python -m spectra` with no session is free exploration: no database, no consent needed, no
+stored data. It is what gets demonstrated, and what the author uses while developing.
+
+**D-079 — The recorder and the session guard are owned by the shell, not by the modes.**
+They are passed into `ModeContext`, so moving between painting and physiotherapy neither
+restarts the recording nor resets the session clock.
+
+**D-080 — Dependency pins corrected to the versions actually installed and tested.**
+The initial pins were written from memory and were wrong (`numpy<2.2` while 2.5.3 was in use).
+Only MediaPipe and OpenCV remain unverified pins, since the headless suite does not install
+them; that is stated in the file itself rather than left implicit.
+
+**D-081 — `mkdocs.yaml` added but the build is not wired into CI.**
+The author's other repositories use MkDocs, and the four documents are already written in
+Markdown. There is no CI in this repository to publish it from, so it stays a local
+convenience.
+
+**D-082 — Screenshots are placeholders with explicit paths.**
+`docs/images/` exists with the exact filenames the README expects, so adding the real captures
+before submission is a drop-in, not an edit of the README.
+
+**D-083 — The camera, the MediaPipe call and the Streamlit script are not unit tested.**
+All three are thin wrappers over a third-party API; testing them would test the mock. They are
+excluded in `.coveragerc` so the figure reflects what is actually verified: **92.6% overall**,
+with the pure-logic packages (`gestures`, `metrics`, `storage`, `guided`, `reports`) between
+94% and 100%.

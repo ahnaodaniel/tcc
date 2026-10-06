@@ -7,7 +7,9 @@
     "stopped": "SPECTRA encerrado.",
     "interact_hint": "Use o gesto para interagir",
     "camera_error": "Não foi possível abrir a webcam.",
-    "frame_error": "Não foi possível ler o primeiro frame da webcam."
+    "frame_error": "Não foi possível ler o primeiro frame da webcam.",
+    "unknown_session": "Sessão não encontrada. Peça ao fisioterapeuta para criá-la novamente.",
+    "session_saved": "Sessão salva com as métricas calculadas."
   },
   "common": {
     "back": "Voltar",
