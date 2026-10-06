@@ -68,8 +68,9 @@ class EduCountMode(BaseMode):
         )
         draw_scoreboard(frame, self.score)
 
-        pointer = self.pointer(detection, frame.shape)
-        states = self.read_states(detection)
+        frame_context = self.observe(frame.shape, detection)
+        pointer = frame_context.pointer
+        states = frame_context.states
 
         if states is None:
             self._hold_start = None

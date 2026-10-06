@@ -17,6 +17,7 @@ from spectra.modes.base import ACTION_MENU, ACTION_QUIT, AppMode, BaseMode, Mode
 from spectra.modes.edu_colors import EduColorsMode
 from spectra.modes.edu_count import EduCountMode
 from spectra.modes.free_draw import FreeDrawMode
+from spectra.modes.guided_draw import GuidedDrawMode
 from spectra.modes.menu import MenuMode
 from spectra.modes.physio import PhysioMode
 from spectra.ui.sound import SoundPlayer
@@ -30,6 +31,7 @@ WINDOW_NAME = "SPECTRA"
 MODE_FACTORIES: dict[AppMode, type[BaseMode]] = {
     AppMode.MENU: MenuMode,
     AppMode.FREE_DRAW: FreeDrawMode,
+    AppMode.GUIDED_DRAW: GuidedDrawMode,
     AppMode.EDU_COLORS: EduColorsMode,
     AppMode.EDU_COUNT: EduCountMode,
     AppMode.PHYSIO: PhysioMode,

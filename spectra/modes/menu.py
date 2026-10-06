@@ -15,6 +15,7 @@ from spectra.ui.widgets import dim_frame, draw_finger_hud, draw_status_bar
 
 MENU_ENTRIES: tuple[tuple[AppMode | str, tuple[int, int, int]], ...] = (
     (AppMode.FREE_DRAW, (20, 90, 20)),
+    (AppMode.GUIDED_DRAW, (90, 60, 20)),
     (AppMode.EDU_COLORS, (20, 20, 120)),
     (AppMode.EDU_COUNT, (80, 20, 120)),
     (AppMode.PHYSIO, (120, 55, 15)),
@@ -47,8 +48,8 @@ class MenuMode(BaseMode):
         draw_status_bar(frame, t("app.title"), AppMode.MENU.title)
         draw_text_centered(frame, t("menu.prompt"), self.width // 2, 90, 0.58, (220, 220, 220))
 
-        pointer = self.pointer(detection, frame.shape)
-        states = self.read_states(detection)
+        pointer = self.observe(frame.shape, detection).pointer
+        states = self.engine.signal.fingers if self.engine.signal.present else None
         if pointer is not None:
             cv2.circle(frame, pointer, 14, (0, 220, 255), -1)
             cv2.circle(frame, pointer, 14, (255, 255, 255), 2)

@@ -114,8 +114,35 @@
     "nothing_to_undo": "Nada para desfazer",
     "gesture": "Gesto: {gesture}",
     "brush": "Pincel:{size}px",
-    "legend_1": "I=Verm  M=Verd  A=Azul  Mi=Amar  I+M=Lara  I+A=Roxo",
-    "legend_2": "M+A=Ciano  I+M+A=Branco(apaga)  A+Mi=Desfaz  Pol=Borr"
+    "pick_color": "Escolha a cor: aponte e mantenha",
+    "legend_1": "1 dedo=apontar  2=pintar  3=apagar",
+    "legend_2": "mao aberta=cores  punho=pausar"
+  },
+  "guided": {
+    "title": "DESENHO GUIADO",
+    "prompt": "Siga a linha com o indicador",
+    "start_hint": "Aponte para o início da figura para começar",
+    "shape": {
+      "line": "Linha",
+      "circle": "Círculo",
+      "zigzag": "Zigue-zague",
+      "spiral": "Espiral"
+    },
+    "difficulty": {
+      "easy": "Fácil",
+      "medium": "Médio",
+      "hard": "Difícil"
+    },
+    "difficulty_label": "Dificuldade: {level}",
+    "shape_label": "Figura: {shape}",
+    "completion": "Percurso: {percent}%",
+    "deviation": "Desvio médio: {value}",
+    "score": "Pontuação: {score}",
+    "time": "Tempo: {seconds}s",
+    "finish": "Concluir",
+    "restart": "Refazer",
+    "result": "Pontuação {score} — percurso {percent}%",
+    "attempt": "Tentativa {number}"
   },
   "edu_colors": {
     "prompt": "Gesticule a combinação de dedos para esta cor:",

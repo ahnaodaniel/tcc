@@ -121,3 +121,55 @@ exactly-held gesture. One microsecond of slack is far below any perceivable dura
 **D-025 — `SessionGuard` lives in `spectra/core`, not in `spectra/gestures`.**
 The session time limit and rest prompts are not gesture concerns: the guided-draw and
 physiotherapy modes need them too, and the reports will record them.
+
+## Phase 3 — Modes
+
+**D-026 — Educational modes kept, not merged into guided drawing.**
+They serve a different purpose: the colour and counting quizzes are *engagement and
+proprioception* exercises with their own scoring, while guided drawing is an *assessment*. They
+also still use finger combinations directly, which is exactly the skill they train. Merging them
+would have produced one mode with two unrelated scoring models.
+
+**D-027 — The free-draw palette moved from finger combinations to a dwell colour menu.**
+Ten memorised combinations are a poor fit for a patient with limited dexterity, and every
+transitional posture painted a stripe. Gestures now choose the *tool* (paint, erase, menu, pause)
+and colour is chosen by dwelling on a swatch. The combination table survives in `palette.py`
+because the colour quiz still teaches it.
+
+**D-028 — Shapes defined in normalised coordinates, scored in normalised units.**
+A score must be comparable between sessions even if the patient's laptop is plugged into a
+different monitor. `test_scoring_is_resolution_independent` pins this down.
+
+**D-029 — Difficulty changes both the corridor and the shape.**
+Only narrowing the tolerance would make "hard" a test of camera noise. Harder levels also tilt
+the line, shrink the circle, add zigzag peaks and add spiral turns, so the movement itself gets
+harder, not just the measurement.
+
+**D-030 — Score weights: 60% completion, 40% accuracy.**
+Clinically, finishing the movement matters more than tracing it beautifully; a patient who
+completes a rough circle has achieved more range than one who draws 20% of a perfect one. The
+accuracy component reaches zero at twice the corridor width.
+
+**D-031 — Dwell buttons go inert outside `IDLE` and `POINTING`.**
+While painting, the pointer sweeps the whole screen and would otherwise trip "clear" or "quit"
+on its way past. Their dwell timers are also reset, so crossing a button never leaves it
+part-charged.
+
+**D-032 — `BaseMode.observe()` runs the gesture engine and the recorder exactly once per frame.**
+The previous design had each mode call `pointer()` and `read_states()` separately, which meant
+the hysteresis estimator could be advanced twice in one frame. A single `FrameContext` makes
+double-stepping impossible.
+
+**D-033 — Metric recording is opt-in per mode (`records_metrics`).**
+Only free draw, guided draw and physiotherapy feed the recorder; the menu and the quizzes do not,
+so time spent navigating does not dilute the session's tracking-quality statistics.
+
+**D-034 — The recorder stores derived features at 10 Hz, never frames.**
+10 Hz is well above the bandwidth of voluntary hand movement (a fast tremor is 4-12 Hz, and the
+Nyquist limit still holds at 10 Hz for the amplitude envelope we measure) while cutting stored
+volume by two thirds versus 30 fps. Tracking quality is counted over *every* frame so the
+presence ratio stays honest.
+
+**D-035 — Each exercise run records a time window (`started_at`, `ended_at`).**
+The metrics engine slices the shared session recording by window, so modes never need to know
+anything about ROM, tremor or fatigue.

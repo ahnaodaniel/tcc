@@ -85,8 +85,9 @@ class EduColorsMode(BaseMode):
         )
         draw_scoreboard(frame, self.score)
 
-        pointer = self.pointer(detection, frame.shape)
-        states = self.read_states(detection)
+        frame_context = self.observe(frame.shape, detection)
+        pointer = frame_context.pointer
+        states = frame_context.states
         if pointer is not None:
             cv2.circle(frame, pointer, 10, (0, 220, 255), -1)
 

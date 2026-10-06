@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+import time
 
 import pytest
 
@@ -94,3 +95,25 @@ def config(tmp_path) -> AppConfig:
 @pytest.fixture
 def empty_detection() -> DetectionResult:
     return DetectionResult()
+
+
+class FakeClock:
+    """A controllable stand-in for ``time.time``."""
+
+    def __init__(self, start: float = 1000.0) -> None:
+        self.now = start
+
+    def __call__(self) -> float:
+        return self.now
+
+    def advance(self, seconds: float) -> float:
+        self.now += seconds
+        return self.now
+
+
+@pytest.fixture
+def clock(monkeypatch) -> FakeClock:
+    """Freeze ``time.time`` so hold times and dwell timers are deterministic."""
+    fake = FakeClock()
+    monkeypatch.setattr(time, "time", fake)
+    return fake

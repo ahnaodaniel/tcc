@@ -117,17 +117,34 @@ class FingerWaveDetector:
 
 @dataclass
 class ExerciseProgress:
-    """Repetition tally and timestamps for the current exercise."""
+    """Repetition tally and the time window of one exercise run.
+
+    The window is what lets the metrics engine slice the session recording per exercise
+    without the mode having to know anything about ROM or tremor.
+    """
 
     exercise: PhysioExercise
     target: int = REPS_TARGET
     reps: int = 0
     started_at: float = field(default_factory=time.time)
+    ended_at: float | None = None
     rep_times: list[float] = field(default_factory=list)
 
     def add_rep(self, now: float | None = None) -> None:
         self.reps += 1
         self.rep_times.append(time.time() if now is None else now)
+
+    def close(self, now: float | None = None) -> None:
+        self.ended_at = time.time() if now is None else now
+
+    @property
+    def duration(self) -> float:
+        end = self.ended_at if self.ended_at is not None else time.time()
+        return max(0.0, end - self.started_at)
+
+    @property
+    def window(self) -> tuple[float, float]:
+        return (self.started_at, self.ended_at if self.ended_at is not None else time.time())
 
     @property
     def completed(self) -> bool:
@@ -149,6 +166,8 @@ class ExerciseProgress:
 
 # -------------------------------------------------------------------------- mode
 class PhysioMode(BaseMode):
+    records_metrics = True
+
     EXERCISES = (
         PhysioExercise.OPEN_CLOSE,
         PhysioExercise.FINGER_TOUCH,
@@ -193,6 +212,7 @@ class PhysioMode(BaseMode):
         self._message_at = time.time()
 
     def _next_exercise(self) -> None:
+        self.progress.close()
         self.history.append(self.progress)
         self.exercise_index = (self.exercise_index + 1) % len(self.EXERCISES)
         self.progress = ExerciseProgress(self.current_exercise)
@@ -240,14 +260,15 @@ class PhysioMode(BaseMode):
         for i, line in enumerate(exercise.instructions):
             draw_text(frame, line, (10, 140 + i * 28), 0.58, (200, 200, 200))
 
-        pointer = self.pointer(detection, frame.shape)
-        hand = self.active_hand(detection)
-        states = self.read_states(detection)
+        frame_context = self.observe(frame.shape, detection)
+        pointer = frame_context.pointer
+        landmarks = frame_context.landmarks
+        states = frame_context.states
 
-        if hand is not None and states is not None and time.time() > self._cooldown_until:
+        if landmarks is not None and states is not None and time.time() > self._cooldown_until:
             if pointer is not None:
                 cv2.circle(frame, pointer, 10, (0, 220, 255), -1)
-            if self._update_detector(exercise, hand.landmarks, states, frame.shape):
+            if self._update_detector(exercise, landmarks, states, frame.shape):
                 self._register_rep()
             self._draw_finger_indicators(frame, states)
 
@@ -331,7 +352,9 @@ class PhysioMode(BaseMode):
         runs = [*self.history, self.progress]
         with path.open("w", newline="", encoding="utf-8") as handle:
             writer = csv.writer(handle)
-            writer.writerow(["session_start", "exercise", "reps", "target", "rep_times"])
+            writer.writerow(
+                ["session_start", "exercise", "reps", "target", "duration_s", "rep_times"]
+            )
             for run in runs:
                 writer.writerow(
                     [
@@ -339,6 +362,7 @@ class PhysioMode(BaseMode):
                         run.exercise.value,
                         run.reps,
                         run.target,
+                        f"{run.duration:.2f}",
                         ";".join(f"{stamp:.3f}" for stamp in run.rep_times),
                     ]
                 )
