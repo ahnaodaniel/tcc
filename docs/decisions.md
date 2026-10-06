@@ -212,3 +212,59 @@ It is the gate on every other metric and is consumed by reports and the panel; b
 **D-043 — NumPy is used for the tremor spectrum only.**
 Everything else in `metrics/` is plain Python, so the modules stay importable and fast. NumPy is
 already a transitive dependency of OpenCV, so this adds nothing to the install.
+
+## Phase 5 — Storage and LGPD
+
+**D-044 — SQLite through stdlib `sqlite3`, no ORM.**
+The schema is nine tables and the queries are simple. An ORM would add a dependency, a
+migration tool and a layer between the code and the encryption boundary, which is exactly the
+place that must stay obvious.
+
+**D-045 — Encryption with Fernet (`cryptography`), not raw AES.**
+Fernet is authenticated (AES-128-CBC + HMAC-SHA256) and versioned, so a tampered field fails
+loudly instead of decrypting to garbage. Hand-rolling AES-GCM would be more code for no gain.
+
+**D-046 — scrypt from `hashlib`, not argon2.**
+Memory-hard and in the standard library, so the patient app gains no dependency. `argon2-cffi`
+is marginally stronger but needs a compiled wheel on Windows for a 4-digit PIN whose real
+protection is the lockout, not the KDF. `maxmem` is passed explicitly because OpenSSL's default
+32 MB cap rejects n=2^15.
+
+**D-047 — CPF lookup by HMAC, not by plain SHA-256.**
+The CPF space is 10^11, which a plain digest makes brute-forceable in minutes. The HMAC key is
+derived from the master key with a domain separator so it cannot decrypt anything.
+
+**D-048 — The patient name is not encrypted; the CPF is.**
+The therapist must search patients by name, and encrypting it would mean decrypting every row
+per search. The risk is accepted explicitly, documented in `docs/lgpd.md`, and mitigated by demo
+mode. The CPF, which is the actual national identifier, gets the full treatment.
+
+**D-049 — The consent gate is a database invariant, not a UI check.**
+`start_session` raises `ConsentRequiredError` when no active consent exists. A UI-level check
+could be bypassed by a future script, a test fixture or the panel; this one cannot.
+
+**D-050 — Anonymisation is offered alongside deletion, and preferred.**
+A participant who withdraws usually wants to stop being identifiable, not to destroy the study.
+`anonymize_patient` strips every identifier and keeps the measurements; `delete_patient`
+cascades everything away. Both are available and both are audited.
+
+**D-051 — The audit log stores UUIDs only.**
+A log holding names or CPFs would be a second, unencrypted copy of the sensitive data — a
+common way for an audit control to become the breach.
+
+**D-052 — Keyring first, 0600 file fallback second, with a warning.**
+Windows Credential Manager is the intended store. Headless Linux and CI have no backend, and
+failing hard there would make the test suite unrunnable. The fallback logs a warning and its
+weaker guarantee is documented.
+
+**D-053 — Backups are zipped then encrypted, not encrypted zips.**
+`zipfile` can only *read* encrypted archives and its legacy ZipCrypto is broken. Sealing the
+whole archive with Fernet, keyed by scrypt from a password, is both stronger and simpler.
+
+**D-054 — `SecurityError` and persistence errors share a `StorageError` root.**
+A caller guarding "save this patient" should not need to know whether the refusal came from CPF
+validation or from the database.
+
+**D-055 — Exports are named `patient_<uuid>.json`.**
+Filenames leak: they appear in sync clients, backup indexes and shoulder-surfing. The UUID is
+the only identifier that ever reaches a filename.
