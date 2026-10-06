@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import threading
 from datetime import date
 
 import pytest
@@ -426,3 +427,32 @@ class TestBackup:
         bogus.write_bytes(b"not a backup")
         with pytest.raises(BackupError):
             restore_backup(bogus, "senha", tmp_path / "restored")
+
+
+class TestThreading:
+    """Streamlit shares one cached service across script threads."""
+
+    def test_the_database_is_usable_from_another_thread(self, db):
+        created = db.create_patient(make_patient())
+        results: list = []
+        errors: list[Exception] = []
+
+        def worker() -> None:
+            try:
+                results.append([p.id for p in db.list_patients()])
+                db.audit.count()
+            except Exception as exc:
+                errors.append(exc)
+
+        thread = threading.Thread(target=worker)
+        thread.start()
+        thread.join()
+
+        assert errors == []
+        assert results == [[created.id]]
+
+    def test_writes_from_another_thread_are_visible_to_the_main_thread(self, db):
+        thread = threading.Thread(target=lambda: db.create_patient(make_patient()))
+        thread.start()
+        thread.join()
+        assert len(db.list_patients()) == 1

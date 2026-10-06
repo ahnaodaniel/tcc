@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import json
 import sqlite3
+import threading
 from collections.abc import Iterator
 from contextlib import contextmanager
 from datetime import date
@@ -194,17 +195,30 @@ class Database:
         self.path = Path(path)
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self._cipher = cipher
-        self._connection = sqlite3.connect(str(self.path))
-        self._connection.row_factory = sqlite3.Row
-        self._connection.execute("PRAGMA foreign_keys = ON")
-        self._connection.execute("PRAGMA journal_mode = WAL")
+        self._local = threading.local()
         self._connection.executescript(SCHEMA)
         if not self._connection.execute("SELECT 1 FROM schema_info").fetchone():
             self._connection.execute(
                 "INSERT INTO schema_info (version) VALUES (?)", (SCHEMA_VERSION,)
             )
         self._connection.commit()
-        self.audit = AuditLog(self._connection)
+        self.audit = AuditLog(lambda: self._connection)
+
+    @property
+    def _connection(self) -> sqlite3.Connection:
+        """The calling thread's connection, opened on first use.
+
+        Streamlit shares one cached service across script threads and sqlite3 connections
+        cannot cross threads, so each thread gets its own connection to the same file.
+        """
+        connection = getattr(self._local, "connection", None)
+        if connection is None:
+            connection = sqlite3.connect(str(self.path))
+            connection.row_factory = sqlite3.Row
+            connection.execute("PRAGMA foreign_keys = ON")
+            connection.execute("PRAGMA journal_mode = WAL")
+            self._local.connection = connection
+        return connection
 
     @classmethod
     def open(cls, db_path: Path, key_path: Path) -> Database:
@@ -212,7 +226,11 @@ class Database:
         return cls(db_path, Cipher.from_key_store(KeyStore(Path(key_path))))
 
     def close(self) -> None:
-        self._connection.close()
+        """Close the calling thread's connection; other threads' close when they end."""
+        connection = getattr(self._local, "connection", None)
+        if connection is not None:
+            connection.close()
+            self._local.connection = None
 
     def __enter__(self) -> Database:
         return self

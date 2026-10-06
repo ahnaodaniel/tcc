@@ -8,16 +8,20 @@ copy of the sensitive data.
 from __future__ import annotations
 
 import sqlite3
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 
 from spectra.storage.models import AuditAction, AuditEntry, new_id, utc_now
 
 
 class AuditLog:
-    """Writes and reads audit entries on an open SQLite connection."""
+    """Writes and reads audit entries on the caller's SQLite connection."""
 
-    def __init__(self, connection: sqlite3.Connection) -> None:
-        self._connection = connection
+    def __init__(self, connection: Callable[[], sqlite3.Connection]) -> None:
+        self._get_connection = connection
+
+    @property
+    def _connection(self) -> sqlite3.Connection:
+        return self._get_connection()
 
     def record(
         self,
