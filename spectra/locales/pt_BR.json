@@ -30,6 +30,47 @@
   "menu": {
     "prompt": "Escolha o modo desejado com o indicador"
   },
+  "gesture": {
+    "state": {
+      "idle": "Aguardando",
+      "pointing": "Apontando",
+      "painting": "Pintando",
+      "erasing": "Apagando",
+      "color_menu": "Menu de cores",
+      "paused": "Pausado"
+    },
+    "action": {
+      "point": "Apontar",
+      "paint": "Pintar",
+      "erase": "Apagar",
+      "color_menu": "Abrir menu de cores",
+      "pause": "Pausar"
+    },
+    "profile": {
+      "standard": "Padrão",
+      "simplified": "Simplificado",
+      "custom": "Personalizado"
+    },
+    "issue": {
+      "missing_action": "A ação \"{actions}\" não tem nenhum gesto associado.",
+      "duplicate_trigger": "As ações \"{actions}\" usam o mesmo gesto ({detail}).",
+      "ambiguous_patterns": "As ações \"{actions}\" diferem por um único dedo ({detail}); podem ser confundidas.",
+      "ring_without_middle": "A ação \"{actions}\" exige o anelar sem o médio ({detail}); é anatomicamente difícil para muitos pacientes.",
+      "ring_and_pinky": "A ação \"{actions}\" usa anelar + mínimo ({detail}); combinação de baixa confiabilidade.",
+      "thumb_dependent": "A ação \"{actions}\" depende do polegar ({detail}); o polegar é o dedo menos confiável em webcam 2D."
+    },
+    "calibration": {
+      "open_prompt": "Abra a mão completamente e mantenha",
+      "closed_prompt": "Feche a mão em punho e mantenha",
+      "done": "Calibração concluída",
+      "fallback": "Dedos sem calibração confiável: {fingers}"
+    }
+  },
+  "safety": {
+    "rest": "Hora de descansar: relaxe a mão por alguns instantes.",
+    "time_limit": "Limite de tempo da sessão atingido.",
+    "paused": "Sessão pausada. Repita o gesto de pausa para retomar."
+  },
   "finger": {
     "thumb": "Polegar",
     "index": "Indicador",

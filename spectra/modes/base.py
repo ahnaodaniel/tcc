@@ -11,7 +11,8 @@ import numpy as np
 from spectra.config import AppConfig
 from spectra.core.smoothing import ExponentialSmoother
 from spectra.detection.hand_detector import DetectionResult
-from spectra.gestures.features import FingerStates, finger_states, pointer_position
+from spectra.gestures.calibration import finger_states
+from spectra.gestures.features import FingerStates, pointer_position
 from spectra.i18n import t
 from spectra.ui.button import Button
 from spectra.ui.sound import SoundPlayer
