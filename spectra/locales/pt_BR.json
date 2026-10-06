@@ -1,0 +1,124 @@
+{
+  "app": {
+    "title": "SPECTRA",
+    "subtitle": "Reabilitação de mão, dedos e punho por gestos",
+    "started": "SPECTRA iniciado.",
+    "hint": "Aponte o indicador e mantenha sobre os botões para navegar.",
+    "stopped": "SPECTRA encerrado.",
+    "interact_hint": "Use o gesto para interagir",
+    "camera_error": "Não foi possível abrir a webcam.",
+    "frame_error": "Não foi possível ler o primeiro frame da webcam."
+  },
+  "common": {
+    "back": "Voltar",
+    "quit": "Sair",
+    "next": "Próximo",
+    "none": "Nenhum",
+    "score": "Placar: {score}/{total}",
+    "streak": "Seq: {streak}  (recorde: {record})",
+    "fps": "FPS:{fps}",
+    "estimate": "estimativa"
+  },
+  "mode": {
+    "menu": "Menu Principal",
+    "free_draw": "Pintura Livre",
+    "guided_draw": "Desenho Guiado",
+    "edu_colors": "Educação: Cores",
+    "edu_count": "Educação: Contagem",
+    "physio": "Fisioterapia"
+  },
+  "menu": {
+    "prompt": "Escolha o modo desejado com o indicador"
+  },
+  "finger": {
+    "thumb": "Polegar",
+    "index": "Indicador",
+    "middle": "Médio",
+    "ring": "Anelar",
+    "pinky": "Mínimo",
+    "short": {
+      "thumb": "P",
+      "index": "I",
+      "middle": "M",
+      "ring": "A",
+      "pinky": "Mi"
+    }
+  },
+  "color": {
+    "red": "Vermelho",
+    "green": "Verde",
+    "blue": "Azul",
+    "yellow": "Amarelo",
+    "orange": "Laranja",
+    "purple": "Roxo",
+    "pink": "Rosa",
+    "cyan": "Ciano",
+    "brown": "Marrom",
+    "white": "Branco/Apaga",
+    "eraser": "Borracha"
+  },
+  "paint": {
+    "title": "PINTURA LIVRE",
+    "clear": "Limpar",
+    "save": "Salvar",
+    "undo": "Desfazer",
+    "command_clear": "LIMPAR",
+    "command_undo": "DESFAZER",
+    "clearing": "Limpando...",
+    "undoing": "Desfazendo...",
+    "canvas_cleared": "Canvas limpo!",
+    "saved": "Salvo: {filename}",
+    "save_failed": "Falha ao salvar",
+    "undone": "Desfeito!",
+    "nothing_to_undo": "Nada para desfazer",
+    "gesture": "Gesto: {gesture}",
+    "brush": "Pincel:{size}px",
+    "legend_1": "I=Verm  M=Verd  A=Azul  Mi=Amar  I+M=Lara  I+A=Roxo",
+    "legend_2": "M+A=Ciano  I+M+A=Branco(apaga)  A+Mi=Desfaz  Pol=Borr"
+  },
+  "edu_colors": {
+    "prompt": "Gesticule a combinação de dedos para esta cor:",
+    "hint": "Dica: {hint}",
+    "correct": "CORRETO! +1  (seq:{streak})",
+    "wrong": "Errado! Era: {hint}"
+  },
+  "edu_count": {
+    "prompt": "Levante esse número de dedos!",
+    "hold_hint": "(mantenha por {secs}s para confirmar)",
+    "your_fingers": "Seus dedos: {count}",
+    "correct": "CERTO! {count} dedo(s)! seq:{streak}",
+    "wrong": "Errado! Era {target}"
+  },
+  "physio": {
+    "title": "FISIOTERAPIA",
+    "exercise_index": "Ex {current}/{total}",
+    "reps": "{done}/{target} reps",
+    "rep_done": "Rep {count}!",
+    "pace": "Ritmo: {rpm} rep/min",
+    "session_timer": "Sessão: {mm}:{ss}",
+    "phase": "Fase: {phase}",
+    "phase_open": "ABRIR",
+    "phase_close": "FECHAR",
+    "completed": "EXERCÍCIO CONCLUÍDO!",
+    "advance": "Avance para o próximo exercício!",
+    "save_session": "Salvar Sessão",
+    "session_saved": "Sessão salva: {filename}",
+    "session_save_failed": "Falha ao salvar a sessão",
+    "exercise": {
+      "open_close": "Abrir e Fechar a Mão",
+      "finger_touch": "Oposição do Polegar (Pinça)",
+      "finger_wave": "Onda de Dedos"
+    },
+    "instructions": {
+      "open_close_1": "1. Abra a mão completamente (4+ dedos levantados)",
+      "open_close_2": "2. Feche em punho (0 dedos levantados)",
+      "open_close_3": "3. Repita suavemente, sem forçar",
+      "finger_touch_1": "1. Toque o polegar na ponta do indicador",
+      "finger_touch_2": "2. Forme uma pinça e solte",
+      "finger_touch_3": "3. Movimento lento e controlado",
+      "finger_wave_1": "1. Levante o indicador e abaixe",
+      "finger_wave_2": "2. Levante o médio e abaixe",
+      "finger_wave_3": "3. Repita com anelar e mínimo em sequência"
+    }
+  }
+}

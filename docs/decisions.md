@@ -29,3 +29,39 @@ o stack de visão em CI.
 **D-006 — Versões fixadas (`==`) nas dependências de runtime.**
 Reprodutibilidade é requisito de um TCC: o avaliador precisa conseguir reproduzir o ambiente.
 `numpy` usa faixa (`>=1.26,<2.2`) por ser dependência transitiva compartilhada.
+
+## Fase 1 — Separação em pacote
+
+**D-007 — Texto na tela passa por uma dobra ASCII (`spectra/ui/text.py`).**
+O OpenCV só tem fontes vetoriais Hershey, que não renderizam acentos: `"Educação"` sairia
+corrompido. O catálogo mantém o pt-BR correto (necessário para relatórios e painel) e a camada
+de desenho remove os diacríticos no último momento. Alternativa descartada: embutir uma fonte
+TrueType via Pillow — custo de desempenho por frame e mais uma dependência no app do paciente.
+
+**D-008 — A detecção retorna `DetectionResult`/`DetectedHand` em vez de duas listas paralelas.**
+O código original passava `lm_list` e `hd_list` juntos e reconstruía a rotulagem em cada modo.
+Um objeto com `for_label()` já implementa a decisão fixa de "uma mão por sessão".
+
+**D-009 — MediaPipe é importado de forma tardia (dentro de `HandDetector.__init__`).**
+Permite importar qualquer módulo do pacote — e rodar toda a suíte de testes — em Linux/WSL sem o
+stack de visão instalado.
+
+**D-010 — `winsound` isolado em `spectra/ui/sound.py` por trás de `SoundPlayer`.**
+Fora do Windows o import falha e todo beep vira *no-op*, sem `try/except` espalhado pelo código.
+
+**D-011 — Os valores dos enums `AppMode` e `PhysioExercise` são chaves de i18n.**
+`AppMode.PHYSIO.value == "physio"` resolve `mode.physio` no catálogo, eliminando um mapa paralelo
+entre enum e rótulo e garantindo que todo modo novo precise de tradução.
+
+**D-012 — `logging` no lugar de `print`, e `ESC` como saída de emergência.**
+O painel e os testes precisam capturar as mensagens. A interação do paciente continua 100% por
+gestos; `ESC` existe apenas como interrupção de segurança para o fisioterapeuta.
+
+**D-013 — Modo "Desenho Guiado" fora do menu até a fase 3.**
+A fase 1 é movimentação de código sem mudança de comportamento; o item do menu seria um botão
+morto. A entrada do enum já existe (`AppMode.GUIDED_DRAW`).
+
+**D-014 — Saídas gravadas no diretório de dados, nunca no diretório de trabalho.**
+`pintura_*.png` vai para `<data_dir>/drawings` e o CSV de fisioterapia para `<data_dir>/exports`.
+Era a causa do PNG solto na raiz do repositório.
+
