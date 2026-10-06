@@ -1,0 +1,19 @@
+# Runtime dependencies for the SPECTRA patient app (Windows) and therapist panel.
+# Python 3.10-3.12 (MediaPipe has no Windows wheels for 3.13 yet).
+
+# Vision / detection
+mediapipe==0.10.21
+opencv-python==4.10.0.84
+numpy>=1.26,<2.2
+
+# Reports
+reportlab==4.2.5
+matplotlib==3.9.2
+
+# Security (LGPD: encryption at rest and OS key storage)
+cryptography==43.0.3
+keyring==25.5.0
+
+# Therapist panel
+streamlit==1.39.0
+pandas==2.2.3
