@@ -314,3 +314,51 @@ means "could not be measured".
 **D-065 — Only three values are compared between sessions.**
 Mean ROM, best guided-drawing score and amplitude decline. Comparing every metric would produce
 a wall of numbers where the regression that matters is invisible.
+
+## Phase 6 — Therapist panel and session flow
+
+**D-066 — Streamlit, with every operation behind `SpectraService`.**
+Streamlit gives a usable clinical panel in one file with no front-end build, no server to
+deploy and no JavaScript — the right trade for a thesis. Its weakness is that the script
+itself is hard to test, so the panel holds **no** business logic: validation, consent, session
+lifecycle, reports and backup all live in `spectra/service.py`, which is unit tested, and
+`therapist_panel/` is excluded from coverage. Rejected: Flask/FastAPI plus a template layer
+(more code, more surface), Tkinter (dated, poor charting), Electron (absurd for this).
+
+**D-067 — `PatientForm` validates before anything reaches the database.**
+Validation returns a list of i18n keys rather than raising on the first problem, so the panel
+can show every error at once instead of making the therapist fix them one at a time.
+
+**D-068 — The consent text lives in `spectra/locales/tcle_pt_BR.md`, not in code.**
+Changing the wording becomes a reviewable diff, and the stored SHA-256 then genuinely proves
+which version a participant saw. The file carries explicit `<<DEFINIR: ...>>` placeholders for
+the researcher and advisor contacts, so an unfilled term is visible rather than silently wrong.
+
+**D-069 — The gesture keypad is for the PIN only; CPF login is by keyboard.**
+Four digits by dwell takes about 5 seconds at 1.2 s per key; eleven digits would take over a
+minute and is a usability failure. The therapist opens the session from the panel and the
+patient confirms with the PIN; the standalone CPF + PIN login exists for the keyboard path.
+
+**D-070 — The PIN is masked on screen as it is typed.**
+The patient app runs on a shared screen, often with the therapist and others present.
+
+**D-071 — `analyze_session` / `analyze_run` sit in `metrics/`, not in `service.py`.**
+They are the seam between pure analysis and persistence. Keeping them as functions of plain
+data means the entire metric pipeline is tested without a database and without a camera.
+
+**D-072 — Metric payloads are stored as JSON blobs.**
+A new metric needs no migration, and the reports already read payloads defensively with
+`.get(...)`. The cost is no SQL aggregation over metrics; with one patient cohort that is not a
+real constraint.
+
+**D-073 — Sample persistence is capped and can be switched off.**
+`MAX_SAMPLES_PERSISTED` bounds a runaway session, and `persist_samples=False` lets a therapist
+keep only the summaries. Summaries are what the reports and the evolution charts actually read.
+
+**D-074 — Demo mode is session state in the panel, not a stored setting.**
+It is a presentation toggle, not a property of the data. It flows into the report builder per
+call, so one click masks the screen and the next generated PDF alike.
+
+**D-075 — Two `.bat` launchers under `scripts/`, which activate the venv and pause on error.**
+A double-clicked `.bat` that fails closes instantly and shows nothing; pausing on error is the
+difference between a usable launcher and an unexplained flash.

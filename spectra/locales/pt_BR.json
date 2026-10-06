@@ -75,6 +75,133 @@
     "estimate_note": "Valor estimado a partir de imagem 2D; não substitui goniometria.",
     "not_measurable": "Não mensurável nesta sessão"
   },
+  "keypad": {
+    "prompt": "Digite seu PIN de 4 dígitos apontando para os números",
+    "clear": "Limpar",
+    "backspace": "Apagar",
+    "accepted": "PIN correto. Bom treino!",
+    "rejected": "PIN incorreto. Tente novamente."
+  },
+  "audit": {
+    "action": {
+      "login_success": "Login",
+      "login_failure": "Falha de login",
+      "account_locked": "Conta bloqueada",
+      "patient_created": "Paciente cadastrado",
+      "patient_updated": "Paciente atualizado",
+      "patient_viewed": "Paciente consultado",
+      "patient_exported": "Dados exportados",
+      "patient_anonymized": "Paciente anonimizado",
+      "patient_deleted": "Paciente excluído",
+      "consent_recorded": "TCLE registrado",
+      "consent_revoked": "TCLE revogado",
+      "session_started": "Sessão iniciada",
+      "session_finished": "Sessão encerrada",
+      "report_generated": "Relatório gerado",
+      "report_exported": "Relatório exportado",
+      "backup_created": "Backup criado"
+    }
+  },
+  "panel": {
+    "navigation": "Navegação",
+    "logout": "Sair",
+    "demo_mode": "Modo demonstração",
+    "demo_mode_help": "Mascara o nome do paciente na tela e nos relatórios, para apresentações.",
+    "data_dir": "Dados em: {path}",
+    "section": {
+      "patients": "Pacientes",
+      "consent": "Consentimento (TCLE)",
+      "session": "Nova sessão",
+      "history": "Histórico e evolução",
+      "privacy": "Privacidade e dados"
+    },
+    "login": {
+      "subtitle": "Painel do fisioterapeuta",
+      "first_run": "Nenhum paciente cadastrado ainda. Crie sua conta abaixo para começar.",
+      "email": "E-mail",
+      "password": "Senha",
+      "name": "Nome",
+      "submit": "Entrar",
+      "failed": "E-mail ou senha incorretos. Tentativas restantes: {remaining}.",
+      "locked": "Conta bloqueada por excesso de tentativas. Aguarde alguns minutos.",
+      "create_account": "Criar conta de fisioterapeuta",
+      "create": "Criar conta",
+      "created": "Conta criada. Faça login acima."
+    },
+    "field": {
+      "phone": "Telefone",
+      "address": "Endereço",
+      "injury_date": "Data da lesão/cirurgia",
+      "referring": "Profissional que encaminhou",
+      "contraindications": "Contraindicações",
+      "notes": "Anotações clínicas",
+      "pin": "PIN de 4 dígitos",
+      "consent": "TCLE",
+      "difficulty": "Dificuldade",
+      "duration": "Duração máxima (min)",
+      "exercises": "Exercícios",
+      "quality": "Qualidade",
+      "action": "Ação",
+      "subject": "Registro"
+    },
+    "patients": {
+      "empty": "Nenhum paciente cadastrado.",
+      "new": "Cadastrar paciente",
+      "save": "Salvar paciente",
+      "saved": "Paciente cadastrado."
+    },
+    "consent": {
+      "active": "TCLE ativo (versão {version}).",
+      "missing": "Este paciente ainda não tem TCLE registrado. Nenhuma sessão pode ser iniciada.",
+      "read": "Ler o termo completo",
+      "hash": "Identificador do documento: {hash}…",
+      "agree": "O participante leu e concorda com o termo acima.",
+      "signed_by": "Assinado por",
+      "record": "Registrar consentimento",
+      "recorded": "Consentimento registrado.",
+      "revoke": "Revogar consentimento"
+    },
+    "session": {
+      "start": "Iniciar sessão",
+      "started": "Sessão criada. No computador do paciente, execute: {command}",
+      "consent_required": "Não é possível iniciar: o paciente não tem TCLE ativo.",
+      "profile_warnings": "O perfil de gestos escolhido tem avisos:",
+      "calibrated": "Calibração do paciente aplicada ({samples} amostras).",
+      "not_calibrated": "Sem calibração individual; serão usados os limiares padrão."
+    },
+    "history": {
+      "empty": "Nenhuma sessão registrada.",
+      "session": "Sessão",
+      "generate": "Gerar relatório",
+      "download_pdf": "Baixar PDF",
+      "download_txt": "Baixar TXT",
+      "export_share": "Exportar para a pasta compartilhada",
+      "exported": "Relatórios exportados."
+    },
+    "privacy": {
+      "export": "Exportar dados (JSON)",
+      "exported": "Exportado: {path}",
+      "anonymize": "Anonimizar",
+      "anonymized": "Paciente anonimizado; as medidas foram preservadas.",
+      "delete": "Excluir definitivamente",
+      "confirm_delete": "Clique novamente para confirmar a exclusão definitiva.",
+      "backup": "Cópia de segurança",
+      "backup_hint": "Gera um arquivo criptografado com o banco e os relatórios. A pasta compartilhada deve ter acesso restrito.",
+      "backup_password": "Senha do backup",
+      "backup_run": "Gerar backup",
+      "backup_done": "Backup criado: {path}",
+      "audit": "Log de auditoria"
+    },
+    "error": {
+      "name_required": "O nome é obrigatório.",
+      "cpf_invalid": "CPF inválido.",
+      "cpf_duplicate": "Já existe um paciente com este CPF.",
+      "pin_invalid": "O PIN deve ter exatamente 4 dígitos.",
+      "birth_date_future": "A data de nascimento não pode estar no futuro.",
+      "injury_date_future": "A data da lesão não pode estar no futuro.",
+      "password_short": "A senha deve ter pelo menos 8 caracteres."
+    }
+  },
   "patient": {
     "sex": {
       "female": "Feminino",
